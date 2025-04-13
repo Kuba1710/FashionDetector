@@ -1,0 +1,21 @@
+# FashionDetector Tech Stack
+
+## Podstawowe technologie
+- **Język programowania**: Python 3.10+
+- **Model AI**: HuggingFace (dostęp do modeli) + GPT-4 Vision API (rozpoznawanie elementów garderoby)
+- **CI/CD**: GitHub Actions
+
+## Dodatkowe kluczowe komponenty
+- **Framework webowy**: FastAPI (szybki rozwój API, dobra wydajność i dokumentacja)
+- **Web scraping**: Scrapy (wydajne i skalowalne przeszukiwanie sklepów internetowych)
+- **Baza danych**: MongoDB (do cachowania wyników wyszukiwania i przechowywania metadanych)
+- **Infrastruktura chmurowa**: AWS Lambda + S3 (serwowanie API i przechowywanie zdjęć)
+- **Narzędzia bezpieczeństwa**: Bandit (analiza statyczna kodu Python pod kątem bezpieczeństwa)
+
+## Uzasadnienie wyboru
+- Powyższy stack zapewnia balans między szybkością dostarczenia MVP a możliwościami przyszłego skalowania
+- FastAPI umożliwi szybkie stworzenie interfejsu API i integrację z frontendem
+- Scrapy sprawdzi się w efektywnym przeszukiwaniu wielu sklepów internetowych
+- MongoDB pozwoli na elastyczne przechowywanie danych o różnej strukturze
+- Usługi AWS zapewnią skalowalność i niezawodność aplikacji
+- GPT-4 Vision oferuje zaawansowane możliwości analizy obrazów, kluczowe dla dokładnego rozpoznawania ubrań 
