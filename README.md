@@ -29,13 +29,13 @@ FashionDetector is a web application that simplifies and accelerates the process
 ### Additional Components
 - **Web Framework**: FastAPI
 - **Web Scraping**: Scrapy
-- **Database**: MongoDB
+- **Database**: PostgreSQL
 - **Cloud Infrastructure**: AWS Lambda + S3
 - **Security Tools**: Bandit (Python static code analysis)
 
 ### Prerequisites
 - Python 3.10 or higher
-- MongoDB
+- PostgreSQL
 - AWS account (for Lambda and S3)
 - API keys for GPT-4 Vision
 
@@ -62,12 +62,6 @@ pip install -r requirements.txt
 ```bash
 # Create a .env file with your API keys and configuration
 touch .env
-```
-
-5. Configure MongoDB:
-```bash
-# Add your MongoDB connection string to the .env file
-echo "MONGODB_URI=your_connection_string" >> .env
 ```
 
 6. Configure AWS credentials:
