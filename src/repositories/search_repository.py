@@ -15,22 +15,35 @@ class SearchRepository:
     def __init__(self):
         """Initialize search repository."""
         self.pool = None
+        
+        # Get database configuration from environment variables with fallbacks
+        # Set DB_ENABLED=false to run without database in development
+        self.db_enabled = os.getenv("DB_ENABLED", "true").lower() != "false"
+        
         self.db_config = {
             "host": os.getenv("DB_HOST", "localhost"),
             "port": int(os.getenv("DB_PORT", "5432")),
             "user": os.getenv("DB_USER", "postgres"),
-            "password": os.getenv("DB_PASSWORD", "postgres"),
+            "password": os.getenv("DB_PASSWORD", ""),
             "database": os.getenv("DB_NAME", "fashiondetector")
         }
+        
+        # Log database configuration (without sensitive info)
+        logger.info(f"Database enabled: {self.db_enabled}")
+        if self.db_enabled:
+            logger.info(f"Database host: {self.db_config['host']}, port: {self.db_config['port']}, db: {self.db_config['database']}, user: {self.db_config['user']}")
     
     async def initialize(self) -> None:
         """Initialize database connection pool."""
+        if not self.db_enabled:
+            logger.info("Database connections disabled by configuration")
+            return
+            
         try:
             self.pool = await asyncpg.create_pool(**self.db_config)
             logger.info("Database connection pool initialized")
         except Exception as e:
             logger.error(f"Error initializing database connection pool: {str(e)}")
-            # In development mode, we can continue without a database
             logger.warning("Running without database connection")
     
     async def close(self) -> None:
@@ -56,7 +69,7 @@ class SearchRepository:
             True if saved successfully, False otherwise
         """
         if not self.pool:
-            logger.warning("Cannot save attribute recognition: No database connection")
+            logger.debug("Cannot save attribute recognition: No database connection")
             return False
         
         try:
@@ -114,7 +127,7 @@ class SearchRepository:
             True if saved successfully, False otherwise
         """
         if not self.pool:
-            logger.warning("Cannot save store search: No database connection")
+            logger.debug("Cannot save store search: No database connection")
             return False
         
         try:
@@ -152,7 +165,7 @@ class SearchRepository:
             True if saved successfully, False otherwise
         """
         if not self.pool:
-            logger.warning("Cannot save search metrics: No database connection")
+            logger.debug("Cannot save search metrics: No database connection")
             return False
         
         try:
@@ -185,7 +198,7 @@ class SearchRepository:
             return True
             
         if not self.pool:
-            logger.warning("Cannot save attributes batch: No database connection")
+            logger.debug("Cannot save attributes batch: No database connection")
             return False
             
         try:

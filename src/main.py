@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 import os
 from dotenv import load_dotenv
+from contextlib import asynccontextmanager
 
 from src.routers.searches import router as searches_router
 from src.middleware.rate_limiter import RateLimiter
@@ -22,6 +23,33 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+# Define lifespan context manager
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Initialize services on application startup and cleanup on shutdown."""
+    logger.info("Starting up FashionDetector API")
+    
+    # Initialize database
+    repository = SearchRepository()
+    await repository.initialize()
+    
+    # Create required directories
+    os.makedirs("temp", exist_ok=True)
+    os.makedirs("temp/search_states", exist_ok=True)
+    
+    logger.info("FashionDetector API startup complete")
+    
+    yield
+    
+    # Cleanup on shutdown
+    logger.info("Shutting down FashionDetector API")
+    
+    # Close database connections
+    repository = SearchRepository()
+    await repository.close()
+    
+    logger.info("FashionDetector API shutdown complete")
+
 # Initialize application
 app = FastAPI(
     title="FashionDetector API",
@@ -29,7 +57,8 @@ app = FastAPI(
     version="1.0.0",
     openapi_tags=[
         {"name": "searches", "description": "Operations for searching clothing items from images"}
-    ]
+    ],
+    lifespan=lifespan
 )
 
 # Middleware configuration
@@ -59,32 +88,6 @@ async def root():
         "version": "1.0.0",
         "description": "API for detecting clothing items from images and searching online stores"
     }
-
-@app.on_event("startup")
-async def startup():
-    """Initialize services on application startup."""
-    logger.info("Starting up FashionDetector API")
-    
-    # Initialize database
-    repository = SearchRepository()
-    await repository.initialize()
-    
-    # Create required directories
-    os.makedirs("temp", exist_ok=True)
-    os.makedirs("temp/search_states", exist_ok=True)
-    
-    logger.info("FashionDetector API startup complete")
-
-@app.on_event("shutdown")
-async def shutdown():
-    """Clean up resources on application shutdown."""
-    logger.info("Shutting down FashionDetector API")
-    
-    # Close database connections
-    repository = SearchRepository()
-    await repository.close()
-    
-    logger.info("FashionDetector API shutdown complete")
 
 if __name__ == "__main__":
     import uvicorn
